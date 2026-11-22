@@ -29,6 +29,15 @@ jobs:
           sudo docker image prune --all --force
           df -h /
 
+      - name: Enable arm64 emulation on the runner
+        run: |
+          # The build's Docker container needs qemu handlers registered in the host kernel
+          # (binfmt_misc); registering them from inside the container failed on the first run.
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends qemu-user-static binfmt-support
+          ls /proc/sys/fs/binfmt_misc/
+          grep -H . /proc/sys/fs/binfmt_misc/qemu-aarch64 | head -5
+
       - name: Fetch pinned build system
         run: |
           git clone --no-checkout "$BUILD_REPO" build
