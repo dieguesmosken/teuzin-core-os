@@ -5,6 +5,11 @@ name: build-image-lts
 
 on:
   workflow_dispatch:
+    inputs:
+      kernel_tag:
+        description: 'Pin kernel to this stable tag, e.g. v6.18.34 (empty = rolling linux-6.18.y branch)'
+        required: false
+        default: ''
 
 permissions:
   contents: read
@@ -47,19 +52,30 @@ jobs:
       - name: Build image
         working-directory: build
         shell: bash   # GitHub's 'bash' adds -eo pipefail, so a compile.sh failure is not hidden by tee
+        env:
+          KERNEL_TAG: ${{ inputs.kernel_tag }}
         run: |
+          KERNEL_PIN=()
+          if [ -n "$KERNEL_TAG" ]; then
+            [[ "$KERNEL_TAG" =~ ^v6\.18\.[0-9]+$ ]] || { echo "invalid kernel_tag: $KERNEL_TAG"; exit 1; }
+            KERNEL_PIN=("KERNELBRANCH=tag:$KERNEL_TAG")
+          fi
+          echo "kernel pin: ${KERNEL_PIN[*]:-none (rolling)}"
           ./compile.sh build \
-            BOARD=bigtreetech-cb1 BRANCH=current RELEASE=trixie \
+            BOARD=bigtreetech-cb1 BRANCH=current RELEASE=trixie "${KERNEL_PIN[@]}" \
             BUILD_MINIMAL=yes BUILD_DESKTOP=no KERNEL_CONFIGURE=no \
             COMPRESS_OUTPUTIMAGE=sha,img \
             2>&1 | tee ../build.log
 
       - name: Collect checksums and versions
+        env:
+          KERNEL_TAG: ${{ inputs.kernel_tag }}
         run: |
           cd build/output/images
           ls -lh
           sha256sum * > ../../../SHA256SUMS-images.txt || true
           echo "build_sha=$BUILD_SHA" > ../../../UPSTREAM-used.txt
+          echo "kernel_tag=${KERNEL_TAG:-rolling}" >> ../../../UPSTREAM-used.txt
           date -u +%FT%TZ >> ../../../UPSTREAM-used.txt
 
       - uses: actions/upload-artifact@v4
