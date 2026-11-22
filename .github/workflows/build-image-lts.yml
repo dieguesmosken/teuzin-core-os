@@ -37,6 +37,7 @@ jobs:
 
       - name: Build image
         working-directory: build
+        shell: bash   # GitHub's 'bash' adds -eo pipefail, so a compile.sh failure is not hidden by tee
         run: |
           ./compile.sh build \
             BOARD=bigtreetech-cb1 BRANCH=current RELEASE=trixie \

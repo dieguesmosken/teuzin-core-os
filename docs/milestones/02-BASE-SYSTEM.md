@@ -20,8 +20,11 @@ Select and validate a verified base for BTT Pi V1.2 (Allwinner H616, 1 GB RAM): 
 The cloud workspace cannot run the build or the bench test: no route to deb.debian.org, apt.armbian.com or kernel.org, 2 CPUs / 7 GB RAM / ~30 GB free, and no board. Build and flashing must happen on an owner-provided Linux host (Ubuntu 24.04, ≥8 GB RAM, ~50 GB free) and a new spare microSD.
 
 ## Work packages
-1. **Pin inputs** — create `UPSTREAM.lock` (build SHA, kernel 6.18.y exact version, U-Boot ref, ATF tag, Debian snapshot/date, host OS). Documentation only.
-2. **Build on owner host** — `./compile.sh` with `BOARD=bigtreetech-cb1 BRANCH=current RELEASE=trixie BUILD_MINIMAL=yes BUILD_DESKTOP=no`; record log, checksums, artifact names. Exact flags to be confirmed against `compile.sh --help` at the pinned SHA.
+1. **Pin inputs** - create `UPSTREAM.lock` recording build SHA, exact kernel 6.18.y version, U-Boot ref, ATF tag, Debian snapshot/date and host OS. Documentation only.
+2. **Build (CI or owner host)** - `./compile.sh build BOARD=bigtreetech-cb1 BRANCH=current RELEASE=trixie BUILD_MINIMAL=yes BUILD_DESKTOP=no KERNEL_CONFIGURE=no`; record log, checksums, artifact names.
+   - **Enforced today:** only the build-system SHA (the workflow checks out the pinned SHA and fails if it does not match).
+   - **Recorded, not enforced:** kernel patch level (moving stable 6.18.y branch), U-Boot v2024.01 + patches, ATF `lts-v2.12.9` (fixed by the family config at that SHA) and the Debian mirror state. After the first build, the exact values are read from the build log and written to `UPSTREAM.lock`.
+   - **Open:** whether `compile.sh` accepts overrides to pin the kernel tag and a Debian snapshot must be confirmed at the pinned SHA before the "reproducible on a clean host" criterion can be claimed. Until then, reproducibility is limited to what is enforced above.
 3. **Bench test (needs approval before any flashing)** — flash a **new** microSD only; never the old recovery card. Validate: boot to login, serial console, hostname, user/SSH (key-only), Ethernet (including large transfers, issue #243 pattern), Wi-Fi fallback, `dmesg` errors, temperature/stability soak, power-cycle behavior.
 4. **Compare with control** — same checks on official Armbian CB1 trixie minimal; decide whether Option B holds or Option C is needed (owner decision, D-002).
 5. **Report** — results, known issues, remaining risks; owner approval gates Milestone 3.
