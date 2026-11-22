@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       kernel_tag:
-        description: 'Pin kernel to this stable tag, e.g. v6.18.34 (empty = rolling linux-6.18.y branch)'
+        description: 'Pin kernel to this stable tag, e.g. v6.18.34 (empty = rolling linux-6.18.y branch, known to break patches)'
         required: false
-        default: ''
+        default: 'v6.18.38'
 
 permissions:
   contents: read
@@ -43,11 +43,18 @@ jobs:
           ls /proc/sys/fs/binfmt_misc/
           grep -H . /proc/sys/fs/binfmt_misc/qemu-aarch64 | head -5
 
+      - uses: actions/checkout@v4
+
       - name: Fetch pinned build system
         run: |
           git clone --no-checkout "$BUILD_REPO" build
           git -C build checkout --detach "$BUILD_SHA"
           test "$(git -C build rev-parse HEAD)" = "$BUILD_SHA"
+
+      - name: Install Teuzin build extension (userpatches)
+        run: |
+          mkdir -p build/userpatches/extensions
+          cp ci/userpatches/extensions/teuzin-ifupdown.sh build/userpatches/extensions/
 
       - name: Build image
         working-directory: build
@@ -64,6 +71,7 @@ jobs:
           ./compile.sh build \
             BOARD=bigtreetech-cb1 BRANCH=current RELEASE=trixie "${KERNEL_PIN[@]}" \
             BUILD_MINIMAL=yes BUILD_DESKTOP=no KERNEL_CONFIGURE=no \
+            ENABLE_EXTENSIONS=teuzin-ifupdown \
             COMPRESS_OUTPUTIMAGE=sha,img \
             2>&1 | tee ../build.log
 
