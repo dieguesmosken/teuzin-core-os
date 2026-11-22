@@ -1,0 +1,64 @@
+# Teuzin Core OS - Milestone 2: LTS kernel base image build (DRAFT, manual only).
+# Builds Debian 13 minimal + kernel 6.18 (BRANCH=current) for BigTreeTech CB1 / BTT Pi V1.2
+# from bigtreetech/build pinned by commit SHA. Produces artifacts only; it never flashes media.
+name: build-image-lts
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  BUILD_REPO: https://github.com/bigtreetech/build.git
+  BUILD_SHA: 555de9b208cb136b26a9c9d2d40aec952abbc444   # bpi-main-26.08.0, checked 2026-11-22
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    steps:
+      - name: Record runner
+        run: |
+          nproc; free -g; df -h /
+          echo "build repo: $BUILD_REPO @ $BUILD_SHA"
+
+      - name: Free disk space (ephemeral runner only)
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force
+          df -h /
+
+      - name: Fetch pinned build system
+        run: |
+          git clone --no-checkout "$BUILD_REPO" build
+          git -C build checkout --detach "$BUILD_SHA"
+          test "$(git -C build rev-parse HEAD)" = "$BUILD_SHA"
+
+      - name: Build image
+        working-directory: build
+        shell: bash   # GitHub's 'bash' adds -eo pipefail, so a compile.sh failure is not hidden by tee
+        run: |
+          ./compile.sh build \
+            BOARD=bigtreetech-cb1 BRANCH=current RELEASE=trixie \
+            BUILD_MINIMAL=yes BUILD_DESKTOP=no KERNEL_CONFIGURE=no \
+            COMPRESS_OUTPUTIMAGE=sha,img \
+            2>&1 | tee ../build.log
+
+      - name: Collect checksums and versions
+        run: |
+          cd build/output/images
+          ls -lh
+          sha256sum * > ../../../SHA256SUMS-images.txt || true
+          echo "build_sha=$BUILD_SHA" > ../../../UPSTREAM-used.txt
+          date -u +%FT%TZ >> ../../../UPSTREAM-used.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: teuzin-core-os-lts-image
+          path: |
+            build/output/images/*
+            build.log
+            SHA256SUMS-images.txt
+            UPSTREAM-used.txt
+          retention-days: 14

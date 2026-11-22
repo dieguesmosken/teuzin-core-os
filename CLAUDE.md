@@ -27,16 +27,7 @@ Preserve upstream files and history. The existing lowercase readme.md is upstrea
 ## Workflow
 Inspect first; state scope and risks; research read-only where appropriate; obtain approval before implementation; validate; report results and unresolved issues.
 
-## Current authorization: Milestone 1 only
-Perform technical research and prepare a sourced implementation proposal. Do not modify code, build scripts, OS images, kernel, bootloader, device tree, partitions or physical media. Do not install anything.
+## Current authorization: Milestone 2 only (LTS kernel track)
+Milestone 1 (technical research) is complete. On 2026-11-22 the owner authorized Milestone 2, limited to the LTS kernel track (Debian 13 minimal + kernel 6.18 via the BTT build `current` target). A newer-kernel track is planning only (docs/KERNEL-ROADMAP.md). Active milestone document: docs/milestones/02-BASE-SYSTEM.md.
 
-Research:
-1. Exact upstream repository, fork relationship, branch, commit ancestry, tags and releases.
-2. Repository layout, build pipeline, dependencies, image artifacts and licensing.
-3. Build reproducibility and clean-host requirements.
-4. BTT Pi V1.2 / CB1 hardware: SoC, architecture, RAM, storage, Ethernet, Wi-Fi, power, boot, interfaces and drivers.
-5. Candidate base releases: Debian base, kernel, bootloader, support status and known regressions, using primary sources and issue trackers.
-6. Feasibility and resource impact on 1 GB RAM, including optional modules.
-7. Security, backup, recovery, update and rollback implications.
-
-Deliver an evidence-based report with source URLs, dates checked, verified facts, assumptions, risks, recommendations, open questions and phased plan. You may propose documentation edits, but do not commit them before owner review. Stop and ask for approval before Milestone 2.
+Allowed: documentation, pinned build inputs, and the manual CI workflow that builds image artifacts. Not allowed without explicit approval for that operation: flashing any physical media, touching the old recovery microSD, changing kernel/bootloader/device-tree sources, installing packages on the owner's machines, or starting Milestone 3.
