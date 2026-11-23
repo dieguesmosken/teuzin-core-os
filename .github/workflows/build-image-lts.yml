@@ -78,7 +78,7 @@ jobs:
       - name: Compress image (GitHub release assets are limited to 2 GiB per file)
         run: |
           cd build/output/images
-          for f in *.img; do xz -T0 -6 "$f"; done
+          for f in *.img; do xz -T0 -6 -c "$f" > "$f.xz" && rm -f "$f"; done
           ls -lh
 
       - name: Collect checksums and versions
