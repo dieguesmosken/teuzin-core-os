@@ -137,7 +137,11 @@ jobs:
 
           Promoted to a normal release only after the owner confirms it was tested.
           EOF
-          gh release create "$TAG" assets/* \
+          # upload-artifact keeps the common parent dir (build/output/images/...), so
+          # collect only the regular files; gh cannot upload a directory.
+          mapfile -t FILES < <(find assets -type f | sort)
+          printf 'Release assets:\n'; printf '  %s\n' "${FILES[@]}"
+          gh release create "$TAG" "${FILES[@]}" \
             --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
             --title "Teuzin Core OS base (LTS ${K}) - build ${{ github.run_number }} [pre-release, untested]" \
             --notes-file notes.md --prerelease
