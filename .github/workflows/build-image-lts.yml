@@ -75,13 +75,19 @@ jobs:
             COMPRESS_OUTPUTIMAGE=sha,img \
             2>&1 | tee ../build.log
 
+      - name: Compress image (GitHub release assets are limited to 2 GiB per file)
+        run: |
+          cd build/output/images
+          for f in *.img; do xz -T0 -6 "$f"; done
+          ls -lh
+
       - name: Collect checksums and versions
         env:
           KERNEL_TAG: ${{ inputs.kernel_tag }}
         run: |
           cd build/output/images
           ls -lh
-          sha256sum * > ../../../SHA256SUMS-images.txt || true
+          sha256sum *.img.xz > ../../../SHA256SUMS-images.txt
           echo "build_sha=$BUILD_SHA" > ../../../UPSTREAM-used.txt
           echo "kernel_tag=${KERNEL_TAG:-rolling}" >> ../../../UPSTREAM-used.txt
           date -u +%FT%TZ >> ../../../UPSTREAM-used.txt
@@ -90,8 +96,49 @@ jobs:
         with:
           name: teuzin-core-os-lts-image
           path: |
-            build/output/images/*
+            build/output/images/*.img.xz
+            build/output/images/*.img.txt
             build.log
             SHA256SUMS-images.txt
             UPSTREAM-used.txt
           retention-days: 14
+
+  release:
+    # Every successful build is published as a PRE-RELEASE (untested).
+    # Promotion to a normal release is done only by the owner, via promote-release.yml.
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      KERNEL_TAG: ${{ inputs.kernel_tag }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: teuzin-core-os-lts-image
+          path: assets
+
+      - name: Create pre-release
+        run: |
+          set -euo pipefail
+          K="${KERNEL_TAG:-rolling}"
+          TAG="base-lts-${K#v}-r${{ github.run_number }}"
+          ls -lh assets
+          cat > notes.md <<EOF
+          **PRE-RELEASE - NOT TESTED ON HARDWARE.** Built by CI and never booted on a BTT Pi V1.2. Do not use on the production card.
+
+          - Base: Debian 13 (trixie) minimal, kernel ${K} (LTS 6.18 series), board bigtreetech-cb1
+          - Build system: bigtreetech/build pinned at commit 555de9b208cb136b26a9c9d2d40aec952abbc444 (no BTT source modified; Teuzin extension in ci/userpatches/extensions)
+          - Built from this repository at ${GITHUB_SHA}, CI run ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}
+          - Verify before flashing: sha256sum -c SHA256SUMS-images.txt
+          - Image is xz-compressed. Flash only to a NEW microSD, never the old recovery card.
+          - The image contains software under several licenses (mostly GPL); the build recipe and sources are those referenced above.
+
+          Promoted to a normal release only after the owner confirms it was tested.
+          EOF
+          gh release create "$TAG" assets/* \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "Teuzin Core OS base (LTS ${K}) - build ${{ github.run_number }} [pre-release, untested]" \
+            --notes-file notes.md --prerelease
+          echo "Release tag: $TAG" >> "$GITHUB_STEP_SUMMARY"

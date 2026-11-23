@@ -1,0 +1,36 @@
+# Promote a tested pre-release to a normal release. Manual, owner-triggered only.
+name: promote-release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to promote (e.g. base-lts-6.18.38-r4)'
+        required: true
+      tested:
+        description: 'I confirm this build was tested on hardware and works'
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-24.04
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ inputs.tag }}
+      TESTED: ${{ inputs.tested }}
+    steps:
+      - name: Promote
+        run: |
+          set -euo pipefail
+          [ "$TESTED" = "true" ] || { echo "tested must be confirmed"; exit 1; }
+          [[ "$TAG" =~ ^base-lts-[A-Za-z0-9.]+-r[0-9]+$ ]] || { echo "invalid tag"; exit 1; }
+          pre=$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json isPrerelease --jq .isPrerelease)
+          [ "$pre" = "true" ] || { echo "$TAG is not a pre-release"; exit 1; }
+          title=$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json name --jq .name | sed 's/ \[pre-release, untested\]/ [tested]/')
+          gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --prerelease=false --latest --title "$title"
+          echo "Promoted $TAG to a normal release" >> "$GITHUB_STEP_SUMMARY"
