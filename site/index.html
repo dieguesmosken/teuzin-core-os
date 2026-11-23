@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Teuzin Core OS — sistema leve para infraestrutura doméstica</title><meta name="description" content="Debian 13 minimal com kernel 6.18 LTS para a BTT Pi V1.2, um projeto da Teuzin Labs.">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="alternate" hreflang="en" href="en/">
+</head>
+<body data-base="">
+<header class="top"><div class="wrap"><nav aria-label="principal">
+<a class="brand" href="#top">Teuzin Core OS</a>
+<a href="#downloads">Downloads</a><a href="#roadmap">Roadmap</a><a href="#install">Instalação</a>
+<a href="en/" lang="en">English</a>
+</nav></div></header>
+<main id="top" class="wrap">
+<div class="hero"><h1>Teuzin Core OS</h1><p>Um sistema leve para infraestrutura doméstica na <strong>BTT Pi V1.2</strong> (Allwinner H616, 1&nbsp;GB de RAM): Debian 13 minimal, kernel 6.18 LTS, serviços nativos e atualizações somente manuais.</p>
+<span class="tag">Debian 13 minimal</span><span class="tag">Kernel 6.18 LTS</span><span class="tag">Projeto da Teuzin Labs</span></div>
+<div class="notice" role="note"><strong>Em desenvolvimento.</strong> A imagem base compila por CI, mas <strong>ainda não foi testada na placa</strong>. Serviços como Pi-hole, Tailscale, Wake-on-LAN e o painel Teuzin Core estão planejados, não implementados.</div>
+<section id="downloads"><h2>Downloads</h2><p class="muted">Toda build bem-sucedida vira uma <strong>pré-release (não testada)</strong>. Só depois do teste em hardware ela é promovida a release normal.</p>
+<div class="card" id="build" aria-live="polite">…</div><div id="releases" style="margin-top:14px">…</div></section>
+<section id="roadmap"><h2>Roadmap</h2><table><tr><th>#</th><th>Marco</th><th>Estado</th></tr><tr><td>1</td><td>Pesquisa técnica</td><td><span class="badge b-ok">Concluído</span></td></tr><tr><td>2</td><td>Base do sistema (kernel LTS)</td><td><span class="badge b-run">Em andamento</span></td></tr><tr><td>3</td><td>Fundação de personalização</td><td><span class="badge b-plan">Planejado</span></td></tr><tr><td>4</td><td>Serviços de rede: Pi-hole e Tailscale</td><td><span class="badge b-plan">Planejado</span></td></tr><tr><td>5</td><td>Administração e observabilidade</td><td><span class="badge b-plan">Planejado</span></td></tr><tr><td>6</td><td>Controle remoto e notificações</td><td><span class="badge b-plan">Planejado</span></td></tr><tr><td>7</td><td>Módulos opcionais</td><td><span class="badge b-plan">Planejado</span></td></tr><tr><td>8</td><td>Build automatizado e validação de imagem limpa</td><td><span class="badge b-plan">Planejado</span></td></tr><tr><td>9</td><td>Estabilização e versão 1.0</td><td><span class="badge b-plan">Planejado</span></td></tr></table></section>
+<section id="install"><h2>Guia de instalação</h2><ol class="steps"><li>Baixe, na release escolhida, o arquivo <code>.img.xz</code> e o <code>SHA256SUMS-images.txt</code>.</li><li>Confira o checksum: <pre>sha256sum -c SHA256SUMS-images.txt</pre></li><li>Descompacte: <pre>xz -d NOME-DA-IMAGEM.img.xz</pre></li><li>Grave a imagem em um <strong>microSD novo</strong> (Balena Etcher, ou Discos no Linux). <strong>Nunca</strong> grave no cartão de recuperação antigo e confira duas vezes o dispositivo escolhido.</li><li>Primeiro boot: acesso por console serial ou SSH. Credenciais e detalhes do primeiro boot serão documentados depois do teste de bancada.</li></ol></section>
+</main>
+<footer><div class="wrap">Projeto derivado de <a href="https://github.com/bigtreetech/CB1">bigtreetech/CB1</a>; não envia alterações ao original. Atribuição e licenças de terceiros preservadas. Imagens contêm software sob várias licenças, majoritariamente GPL. <a href="https://github.com/dieguesmosken/teuzin-core-os">Código no GitHub</a>.</div></footer>
+<script src="assets/app.js" defer></script>
+</body></html>
