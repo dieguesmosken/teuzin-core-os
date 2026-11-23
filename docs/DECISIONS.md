@@ -41,5 +41,10 @@ Approved by the owner on 2026-11-22: every successful CI image build is publishe
 ## D-013 — Project landing page and website
 Approved by the owner on 2026-11-22: a custom repository landing page (`.github/README.md`, PT-BR and EN; the upstream `readme.md` is kept untouched) and a static project website deployed by GitHub Actions to GitHub Pages under a teuzin.com.br subdomain. The site lists releases, roadmap, install guide and build status. Branding details remain subject to Milestone 3 review.
 
+## D-014 — Bootloader for the LTS track
+Approved by the owner on 2026-11-23: keep the 6.18 LTS kernel (`BRANCH=current`), but build U-Boot and ATF from the sources that `BRANCH=vendor` uses: `bigtreetech/u-boot` branch `bpi-v2026.04` pinned by commit, and ATF `lts-v2.14.1`. Implemented as the build extension `ci/userpatches/extensions/teuzin-vendor-uboot.sh`; no bigtreetech source is modified.
+Evidence (bench, 2026-11-23, BTT Pi V1.2 with AC300 Ethernet PHY): build 10 (`base-lts-6.18.38-r10`, mainline U-Boot v2024.01) printed no line on the UART0 serial console (115200) and brought up neither HDMI nor Ethernet. The official BTT image V3.1.0 (`CB1_Debian13_minimal_kernel7.0_20260430`, `BRANCH=vendor`) booted on the same board and card reader setup with serial, Ethernet and HDMI working. Pending confirmation: r10 with only the bootloader area replaced by the V3.1.0 one.
+Alternative not taken: switch the whole image to `BRANCH=vendor` (BTT kernel 7.0), which would leave the LTS track.
+
 ## Change control
 If research conflicts with an approved decision, document the conflict and alternatives and ask the owner. Do not silently reinterpret approval.
