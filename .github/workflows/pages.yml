@@ -1,0 +1,53 @@
+# Builds and deploys the project website (site/) to GitHub Pages.
+# Release and build-status data are generated at deploy time from the GitHub API.
+name: pages
+
+on:
+  push:
+    branches: [master]
+    paths: ['site/**', '.github/workflows/pages.yml']
+  workflow_run:
+    workflows: [build-image-lts, promote-release]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate release and build data
+        run: |
+          set -euo pipefail
+          mkdir -p site/data
+          gh api "repos/$GITHUB_REPOSITORY/releases" --paginate \
+            --jq '[.[] | select(.draft==false) | {tag:.tag_name, name:.name, prerelease:.prerelease, published_at:.published_at, html_url:.html_url, assets:[.assets[] | {name:.name, size:.size, url:.browser_download_url}]}]' \
+            | jq -s 'add // []' > site/data/releases.json
+          latest=$(jq -r '.[0].tag // empty' site/data/releases.json)
+          gh api "repos/$GITHUB_REPOSITORY/actions/workflows/build-image-lts.yml/runs?status=completed&per_page=1" \
+            --jq '.workflow_runs[0] // {} | {conclusion:.conclusion, updated_at:.updated_at, html_url:.html_url, run_number:.run_number}' \
+            | jq --arg r "$latest" '. + {latest_release:$r}' > site/data/status.json
+          cat site/data/status.json; jq length site/data/releases.json
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4

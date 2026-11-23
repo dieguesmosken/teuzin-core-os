@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Teuzin Core OS — lightweight home-infrastructure OS</title><meta name="description" content="Debian 13 minimal with the 6.18 LTS kernel for the BTT Pi V1.2, by Teuzin Labs.">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="alternate" hreflang="pt-BR" href="../">
+</head>
+<body data-base="../">
+<header class="top"><div class="wrap"><nav aria-label="principal">
+<a class="brand" href="#top">Teuzin Core OS</a>
+<a href="#downloads">Downloads</a><a href="#roadmap">Roadmap</a><a href="#install">Install</a>
+<a href="../" lang="pt-BR">Português</a>
+</nav></div></header>
+<main id="top" class="wrap">
+<div class="hero"><h1>Teuzin Core OS</h1><p>A lightweight OS for home infrastructure on the <strong>BTT Pi V1.2</strong> (Allwinner H616, 1&nbsp;GB RAM): Debian 13 minimal, 6.18 LTS kernel, native services and manual-only updates.</p>
+<span class="tag">Debian 13 minimal</span><span class="tag">6.18 LTS kernel</span><span class="tag">By Teuzin Labs</span></div>
+<div class="notice" role="note"><strong>Under development.</strong> The base image builds on CI but is <strong>not yet tested on hardware</strong>. Pi-hole, Tailscale, Wake-on-LAN and the Teuzin Core panel are planned, not implemented.</div>
+<section id="downloads"><h2>Downloads</h2><p class="muted">Every successful build is published as an <strong>untested pre-release</strong>. It becomes a normal release only after hardware testing.</p>
+<div class="card" id="build" aria-live="polite">…</div><div id="releases" style="margin-top:14px">…</div></section>
+<section id="roadmap"><h2>Roadmap</h2><table><tr><th>#</th><th>Milestone</th><th>Status</th></tr><tr><td>1</td><td>Technical research</td><td><span class="badge b-ok">Done</span></td></tr><tr><td>2</td><td>Base system (LTS kernel)</td><td><span class="badge b-run">In progress</span></td></tr><tr><td>3</td><td>Customization foundation</td><td><span class="badge b-plan">Planned</span></td></tr><tr><td>4</td><td>Core network services: Pi-hole and Tailscale</td><td><span class="badge b-plan">Planned</span></td></tr><tr><td>5</td><td>Administration and observability</td><td><span class="badge b-plan">Planned</span></td></tr><tr><td>6</td><td>Remote control and notifications</td><td><span class="badge b-plan">Planned</span></td></tr><tr><td>7</td><td>Optional modules</td><td><span class="badge b-plan">Planned</span></td></tr><tr><td>8</td><td>Automated build and clean-image validation</td><td><span class="badge b-plan">Planned</span></td></tr><tr><td>9</td><td>Stabilization and 1.0</td><td><span class="badge b-plan">Planned</span></td></tr></table></section>
+<section id="install"><h2>Install guide</h2><ol class="steps"><li>From the chosen release, download the <code>.img.xz</code> file and <code>SHA256SUMS-images.txt</code>.</li><li>Verify the checksum: <pre>sha256sum -c SHA256SUMS-images.txt</pre></li><li>Decompress: <pre>xz -d IMAGE-NAME.img.xz</pre></li><li>Flash to a <strong>new microSD</strong> (Balena Etcher, or Disks on Linux). <strong>Never</strong> flash the old recovery card, and double-check the selected device.</li><li>First boot: serial console or SSH. Credentials and first-boot details will be documented after bench testing.</li></ol></section>
+</main>
+<footer><div class="wrap">Derivative of <a href="https://github.com/bigtreetech/CB1">bigtreetech/CB1</a>; never sends changes back to the original. Attribution and third-party licenses preserved. Images contain software under several licenses, mostly GPL. <a href="https://github.com/dieguesmosken/teuzin-core-os">Source on GitHub</a>.</div></footer>
+<script src="../assets/app.js" defer></script>
+</body></html>

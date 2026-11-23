@@ -32,5 +32,14 @@ Approved: preserve the old microSD containing the previous Pi-hole/Tailscale set
 ## D-010 — Milestone workflow
 Approved: research before implementation; work incrementally; test and review each milestone; commit meaningful progress in clear milestone-sized commits after review and authorization.
 
+## D-011 — Derivative project, no upstream contributions
+Approved by the owner on 2026-11-22: this repository is a derivative of bigtreetech/CB1, not a contribution fork. Changes are never sent back to the original. Do not open pull requests, issues or comments on bigtreetech repositories from this project. Upstream attribution and licenses are preserved (see CLAUDE.md).
+
+## D-012 — Release policy
+Approved by the owner on 2026-11-22: every successful CI image build is published automatically as a GitHub **pre-release** and is considered untested. Only after the owner reports that a build was tested on hardware is it promoted to a normal release (workflow `promote-release`). Images are never flashed by the assistant; the owner flashes new media only.
+
+## D-013 — Project landing page and website
+Approved by the owner on 2026-11-22: a custom repository landing page (`.github/README.md`, PT-BR and EN; the upstream `readme.md` is kept untouched) and a static project website deployed by GitHub Actions to GitHub Pages under a teuzin.com.br subdomain. The site lists releases, roadmap, install guide and build status. Branding details remain subject to Milestone 3 review.
+
 ## Change control
 If research conflicts with an approved decision, document the conflict and alternatives and ask the owner. Do not silently reinterpret approval.
