@@ -55,6 +55,7 @@ jobs:
         run: |
           mkdir -p build/userpatches/extensions
           cp ci/userpatches/extensions/teuzin-ifupdown.sh build/userpatches/extensions/
+          cp ci/userpatches/extensions/teuzin-vendor-uboot.sh build/userpatches/extensions/
 
       - name: Build image
         working-directory: build
@@ -71,7 +72,7 @@ jobs:
           ./compile.sh build \
             BOARD=bigtreetech-cb1 BRANCH=current RELEASE=trixie "${KERNEL_PIN[@]}" \
             BUILD_MINIMAL=yes BUILD_DESKTOP=no KERNEL_CONFIGURE=no \
-            ENABLE_EXTENSIONS=teuzin-ifupdown \
+            ENABLE_EXTENSIONS=teuzin-ifupdown,teuzin-vendor-uboot \
             COMPRESS_OUTPUTIMAGE=sha,img \
             2>&1 | tee ../build.log
 
@@ -90,6 +91,7 @@ jobs:
           sha256sum *.img.xz > ../../../SHA256SUMS-images.txt
           echo "build_sha=$BUILD_SHA" > ../../../UPSTREAM-used.txt
           echo "kernel_tag=${KERNEL_TAG:-rolling}" >> ../../../UPSTREAM-used.txt
+          grep -E "^TEUZIN_(UBOOT_SOURCE|UBOOT_COMMIT|ATF_TAG)=" ../../../ci/userpatches/extensions/teuzin-vendor-uboot.sh | sed 's/ *#.*//' >> ../../../UPSTREAM-used.txt
           date -u +%FT%TZ >> ../../../UPSTREAM-used.txt
 
       - uses: actions/upload-artifact@v4
@@ -130,6 +132,7 @@ jobs:
 
           - Base: Debian 13 (trixie) minimal, kernel ${K} (LTS 6.18 series), board bigtreetech-cb1
           - Build system: bigtreetech/build pinned at commit 555de9b208cb136b26a9c9d2d40aec952abbc444 (no BTT source modified; Teuzin extension in ci/userpatches/extensions)
+          - Bootloader: U-Boot from bigtreetech/u-boot (bpi-v2026.04, pinned commit) + ATF lts-v2.14.1, instead of mainline U-Boot v2024.01 (decision D-014); kernel stays on 6.18 LTS
           - Built from this repository at ${GITHUB_SHA}, CI run ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}
           - Verify before flashing: sha256sum -c SHA256SUMS-images.txt
           - Image is xz-compressed. Flash only to a NEW microSD, never the old recovery card.

@@ -12,7 +12,7 @@ Select and validate a verified base for BTT Pi V1.2 (Allwinner H616, 1 GB RAM): 
 
 ## Verified facts about the `current` target (from build repo at the pinned SHA)
 - Kernel: mainline stable 6.18.y plus Armbian `archive/sunxi-6.18` patches and the CB1 DTS (`sun50i-h616-bigtreetech-cb1-sd`); config `linux-sunxi64-current.config`. The source ref is a moving branch, so it must be pinned in `UPSTREAM.lock`.
-- U-Boot: **mainline v2024.01 + Armbian patches**, with the CB1 defconfig/DTS added by `board_bigtreetech-cb1/bigtreetech-cb1-dts-and-deconfig.patch`. This is older than the vendor U-Boot (`bpi-v2026.04`) used by `BRANCH=vendor`. Whether it is acceptable is a bench-test question, not an assumption.
+- U-Boot: **mainline v2024.01 + Armbian patches**, with the CB1 defconfig/DTS added by `board_bigtreetech-cb1/bigtreetech-cb1-dts-and-deconfig.patch`. This is older than the vendor U-Boot (`bpi-v2026.04`) used by `BRANCH=vendor`. Whether it is acceptable is a bench-test question, not an assumption. **Bench result 2026-11-23:** with this U-Boot, build 10 stayed silent on the serial console of a BTT Pi V1.2 while the official vendor image booted; replaced by the vendor U-Boot per D-014.
 - ATF: `lts-v2.12.9` for `current` (vendor uses `lts-v2.14.1`).
 - Wi-Fi: RTL8189FS built as module; availability on 6.18 must be confirmed on hardware.
 
